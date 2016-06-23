@@ -195,8 +195,16 @@ app.config(['ENV', '$stateProvider', '$urlRouterProvider', '$ionicConfigProvider
         templateUrl: 'view/joblisting/detail.html',
         controller: 'JoblistingDetailCtrl'
       })
-
-    .state('goDriverCodeCtrl', {
+      .state('index.setting', {
+        url: '/setting/setting',
+        views: {
+          'menuContent': {
+            templateUrl: 'view/setting/setting.html',
+            controller: 'SettingCtrl'
+          }
+        }
+      })
+      .state('goDriverCodeCtrl', {
         url: '/login',
         views: {
           'menuContent': {

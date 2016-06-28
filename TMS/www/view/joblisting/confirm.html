@@ -3,7 +3,7 @@
         <div class="buttons">
             <button class="button button-icon button-clear ion-android-arrow-back" ng-click="returnDetail()"></button>
         </div>
-        <h1 class="title">Job Confirmation</h1>
+        <h1 class="title" ng-bind="title">Job Confirmation</h1>
     </ion-header-bar>
     <ion-pane>
         <div style="height: 43px;"></div>
@@ -13,18 +13,10 @@
                 <p>following was collected/delivered :</p>
                 <div class="row">
                     <div class="col">
-                        <h2>Amount</h2>
-                    </div>
-                    <div class="col">
-                        <h2>0</h2>
-                    </div>
-                </div>
-                <div class="row">
-                    <div class="col">
                         <h2>Packages</h2>
                     </div>
                     <div class="col">
-                        <h2>0</h2>
+                        <h2 ng-bind="Confirmation.tobk1.Packages">0</h2>
                     </div>
                 </div>
             </div>
@@ -40,7 +32,7 @@
 
                 </div>
             </div>
-              <div class="item item-divider">
+              <!-- <div class="item item-divider">
                  Service Rating
               </div>
               <div class="button-bar">
@@ -54,7 +46,7 @@
                   </button>
                   <button class="button icon ion-android-star-outline">
                   </button>
-              </div>
+              </div> -->
         </div>
     </ion-pane>
     <ion-footer-bar class="bar-positive hide-on-keyboard-open">

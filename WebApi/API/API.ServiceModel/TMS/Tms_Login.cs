@@ -23,7 +23,7 @@ namespace WebApi.ServiceModel.TMS
     {
         public Boolean BlnContactNo = true;
         public IDbConnectionFactory DbConnectionFactory { get; set; }
-        public int LoginCheck(Tms_Login request)
+        public List<Todr1> LoginCheck(Tms_Login request)
         {
             //int Result = -1; //20160511 注释
             //try
@@ -44,27 +44,35 @@ namespace WebApi.ServiceModel.TMS
             //}
             //catch { throw; }
             //return Result;
-           
-            int Result = -1;    //20160511 
+
+            List<Todr1> Result = null;    //20160511 
             try
             {
                 using (var db = DbConnectionFactory.OpenDbConnection("TMS"))
                 {
-                    if (request.ContactNo != null && request.ContactNo.Length > 0)
-                    { 
-                        string strSql = "Select count(*) From Todr1 Where ContactNo1='" + request.ContactNo + "' ";
-                        Result = db.Scalar<int>(strSql);
-                        if (Result < 1)
-                        {
-                            strSql = "Select count(*) From Todr1 Where ContactNo2='" + request.ContactNo + "' ";
-                            Result = db.Scalar<int>(strSql);
-                            BlnContactNo = false;
-                        }
-                        else
-                        { 
-                            BlnContactNo = true;
-                        }
+                    //if (request.ContactNo != null && request.ContactNo.Length > 0)    ///20160627 update login logic  DriverCode
+                    //{ 
+                    //    string strSql = "Select count(*) From Todr1 Where ContactNo1='" + request.ContactNo + "' ";
+                    //    Result = db.Scalar<int>(strSql);
+                    //    if (Result < 1)
+                    //    {
+                    //        strSql = "Select count(*) From Todr1 Where ContactNo2='" + request.ContactNo + "' ";
+                    //        Result = db.Scalar<int>(strSql);
+                    //        BlnContactNo = false;
+                    //    }
+                    //    else
+                    //    { 
+                    //        BlnContactNo = true;
+                    //    }
+                    //}
+
+
+                    if (request.DriverCode != null && request.DriverCode.Length > 0)
+                    {
+                        string strSql = "Select isnull(DriverName,'') as  DriverName From Todr1 Where DriverCode='" + request.DriverCode + "' ";
+                        Result = db.Select<Todr1>(strSql);
                     }
+
                 }
             }
             catch { throw; }

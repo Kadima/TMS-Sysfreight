@@ -32,6 +32,14 @@ namespace WebApi.ServiceModel.Tables
         public string UomCode { get; set; }
         public string DriverCode { get; set; }
         public string AttachmentFlag { get; set; }
+        public decimal TotalGrossWeight { get; set; }
+        public int NoOfPallet { get; set; }
+        public decimal TotalVolume { get; set; }
+        public string DescriptionOfGoods1 { get; set; }
+        public string Description { get; set; }
+        public string Note { get; set; }
+
+       
 
     }
 }

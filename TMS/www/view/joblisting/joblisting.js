@@ -336,7 +336,7 @@ app.controller('JoblistingCtrl', ['$scope', '$state', '$stateParams',
 
 app.controller('JoblistingDetailCtrl', ['ENV', '$scope', '$state', '$ionicActionSheet', '$cordovaSms', '$stateParams', 'ApiService', '$ionicPlatform', '$cordovaSQLite', '$rootScope',
   function(ENV, $scope, $state, $ionicActionSheet, $cordovaSms, $stateParams, ApiService, $ionicPlatform, $cordovaSQLite, $rootScope) {
-    $scope.BookingNo = $stateParams.BookingNo;
+    // $scope.BookingNo = $stateParams.BookingNo;
     // $scope.CompletedFlagDetail = $stateParams.CompletedFlagDetail;
     // console.log($stateParams.BookingNo + 'aaaa' + $scope.CompletedFlagDetail);
     // $scope.tobk2 = {
@@ -345,12 +345,27 @@ app.controller('JoblistingDetailCtrl', ['ENV', '$scope', '$state', '$ionicAction
     //     Discount:0,
     //     Collected:0
     //    };
+
+
     $scope.Detail = {
       tobk1: {
         BookingNo: $stateParams.BookingNo,
       },
       PhoneNumber: 'tel:08605925888865'
     };
+
+
+var showDetailTobk1=function(){
+  var strUri = '/api/tms/tobk1?BookingNo=' + $scope.Detail.tobk1.BookingNo;
+  ApiService.GetParam(strUri, true).then(function success(result) {
+    var results = result.data.results;
+    if (is.not.empty(results)) {
+      $scope.Detail.tobk1 = results[0];
+      showDetailTitle($scope.Detail.tobk1.JobType, $scope.Detail.tobk1.JobNo);
+    } else {}
+  });
+};
+
     var dataResults = new Array();
     var showTobk = function() {
       if (is.not.empty($scope.Detail.tobk1.BookingNo)) {
@@ -362,6 +377,9 @@ app.controller('JoblistingDetailCtrl', ['ENV', '$scope', '$state', '$ionicAction
                   if (results.rows.length > 0) {
                     $scope.Detail.tobk1 = results.rows.item(0);
                     showDetailTitle($scope.Detail.tobk1.JobType, $scope.Detail.tobk1.JobNo);
+                  }
+                  else{
+                        showDetailTobk1();
                   }
                 },
                 function(error) {}
@@ -375,6 +393,9 @@ app.controller('JoblistingDetailCtrl', ['ENV', '$scope', '$state', '$ionicAction
                 if (results.rows.length > 0) {
                   $scope.Detail.tobk1 = results.rows.item(0);
                   showDetailTitle($scope.Detail.tobk1.JobType, $scope.Detail.tobk1.JobNo);
+                }
+                else{
+                  showDetailTobk1();
                 }
               });
             }, dbError);
@@ -475,7 +496,7 @@ app.controller('JoblistingDetailCtrl', ['ENV', '$scope', '$state', '$ionicAction
       var success = function() {};
       var error = function(e) {};
       $cordovaSms.send($scope.PhoneNumber, $scope.message, options, success, error);
-    }
+    };
   }
 ]);
 app.controller('JoblistingConfirmCtrl', ['ENV', '$scope', '$state', '$stateParams', 'ApiService', '$ionicPopup', '$ionicPlatform', '$cordovaSQLite', '$rootScope',

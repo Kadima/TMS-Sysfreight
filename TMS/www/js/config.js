@@ -3,6 +3,7 @@ var appConfig = angular.module('TMS.config',[]);
 appConfig.constant('ENV', {
     'website':      'www.sysfreight.net/app/tms/sysfreight',
     'api':          'www.sysfreight.net/apis/tms/sysfreight',
+    //  'api':'http://localhost:2979',
     'port':         '8081', // http port no
     'debug':        true,
     'mock':         false,

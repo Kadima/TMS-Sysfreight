@@ -10,7 +10,7 @@ using WebApi.ServiceModel.Tables;
 namespace WebApi.ServiceModel.TMS
 {
     [Route("/tms/tobk1/sps", "Get")]  // sps?RecordCount=
-    [Route("/tms/tobk1/update", "Get")] //update?CompletedFlag=
+    [Route("/tms/tobk1/update", "Get")] //update?CompletedFlag= / remark=
     [Route("/tms/tobk1/confirm", "Get")] //update?BookingNo=
     [Route("/tms/tobk1", "Get")]      //tobk1?BookingNo=
     [Route("/tms/tobk2", "Get")]      //tobk2?BookingNo=
@@ -20,6 +20,7 @@ namespace WebApi.ServiceModel.TMS
         public string BookingNo { get; set; }
         public string CompletedFlag { get; set; }
         public string DriverCode { get; set; }
+        public string Remark { get; set; }
 
     }
     public class Tobk_Logic
@@ -44,15 +45,24 @@ namespace WebApi.ServiceModel.TMS
 
                         strWhere = "Where BookingNo='" + request.BookingNo + "'";
                         //  var strSQL = "SELECT t1.BookingNo,JobNo,CustomerCode,CustomerName,CustomerRefNo,CompletedFlag,DeliveryEndDateTime,TotalPcs,Toaddress1,Toaddress2,Toaddress3,Toaddress4,UOMCode" _
-                        var strSQL = " SELECT t1.BookingNo,JobNo,isnull(CustomerCode,'' ) AS CustomerCode,isnull(CustomerName,'') as CustomerName," +
-                            "isnull(CustomerRefNo,'') as CustomerRefNo,isnull(CompletedFlag,'') AS CompletedFlag,DeliveryEndDateTime,TotalPcs," +
-                            "isnull(JobType,'')as JobType,EstimateDeliveryDateTime,isnull(FromPostalCode,'')as FromPostalCode,isnull(FromName,'') as FromName, isnull(FromAddress1,'')as FromAddress1 ,isnull(FromAddress2,'')as FromAddress2,isnull(FromAddress3,'')as FromAddress3,isnull(FromAddress4,'')as FromAddress4," +
-                            "isnull(ToPostalCode,'') as ToPostalCode,isnull(ToName,'')as ToName,isnull(ToAddress1,'') as ToAddress1,isnull(ToAddress2,'') as ToAddress2," +
-                            "isnull(ToAddress3,'') as ToAddress3,isnull(ToAddress4,'') as ToAddress4,isnull(UomCode,'')as UomCode" +
-                            " FROM Tobk1 t1," +
-                             "(SELECT TOP " + (count + 20) + "row_number() OVER(ORDER BY bookingNo ASC) n, bookingNo FROM Tobk1  " + strWhere + " ) t2 " +
-                             "WHERE t1.bookingNo = t2.bookingNo AND StatusCode<> 'DEL' AND t2.n >" + count +
-                             "ORDER BY t2.n ASC";
+
+                        //var strSQL = " SELECT t1.BookingNo,JobNo,isnull(CustomerCode,'' ) AS CustomerCode,isnull(CustomerName,'') as CustomerName," +    //20160629
+                        //    "isnull(CustomerRefNo,'') as CustomerRefNo,isnull(CompletedFlag,'') AS CompletedFlag,DeliveryEndDateTime,TotalPcs," +
+                        //    "isnull(JobType,'')as JobType,EstimateDeliveryDateTime,isnull(FromPostalCode,'')as FromPostalCode,isnull(FromName,'') as FromName, isnull(FromAddress1,'')as FromAddress1 ,isnull(FromAddress2,'')as FromAddress2,isnull(FromAddress3,'')as FromAddress3,isnull(FromAddress4,'')as FromAddress4," +
+                        //    "isnull(ToPostalCode,'') as ToPostalCode,isnull(ToName,'')as ToName,isnull(ToAddress1,'') as ToAddress1,isnull(ToAddress2,'') as ToAddress2," +
+                        //    "isnull(ToAddress3,'') as ToAddress3,isnull(ToAddress4,'') as ToAddress4,isnull(UomCode,'')as UomCode" +
+                        //    " FROM Tobk1 t1," +
+                        //     "(SELECT TOP " + (count + 20) + "row_number() OVER(ORDER BY bookingNo ASC) n, bookingNo FROM Tobk1  " + strWhere + " ) t2 " +
+                        //     "WHERE t1.bookingNo = t2.bookingNo AND StatusCode<> 'DEL' AND t2.n >" + count +
+                        //     "ORDER BY t2.n ASC";
+
+                        var strSQL = "SELECT BookingNo, JobNo, isnull(CustomerCode,'' ) AS CustomerCode, isnull(CustomerName,'') as CustomerName," +
+                          " isnull(CustomerRefNo, '') as CustomerRefNo,isnull(CompletedFlag, '') AS CompletedFlag, DeliveryEndDateTime, TotalPcs," +
+                          " isnull(JobType,'')as JobType,EstimateDeliveryDateTime,isnull(FromPostalCode, '') as FromPostalCode,isnull(FromName, '') as FromName, isnull(FromAddress1, '') as FromAddress1 ,isnull(FromAddress2, '') as FromAddress2,isnull(FromAddress3, '') as FromAddress3,isnull(FromAddress4, '') as FromAddress4," +
+                          " isnull(ToPostalCode, '') as ToPostalCode,isnull(ToName, '') as ToName,isnull(ToAddress1, '') as ToAddress1,isnull(ToAddress2, '') as ToAddress2," +
+                          " isnull(ToAddress3, '') as ToAddress3,isnull(ToAddress4, '') as ToAddress4,isnull(UomCode, '') as UomCode" +
+                          ", Tobk1.TotalGrossWeight,Tobk1.NoOfPallet,Tobk1.TotalVolume,isnull(Tobk1.DescriptionOfGoods1,'')as DescriptionOfGoods1 ,isnull(Tobk1.Description,'') as Description,isnull(Tobk1.Note,'') as Note" +
+                          " FROM Tobk1 where BookingNo='" + request.BookingNo + "'";
                         Result = db.Select<Tobk1>(strSQL);
                     }
                     else if (!string.IsNullOrEmpty(request.DriverCode))
@@ -62,6 +72,7 @@ namespace WebApi.ServiceModel.TMS
                            " isnull(JobType,'')as JobType,EstimateDeliveryDateTime,isnull(FromPostalCode, '') as FromPostalCode,isnull(FromName, '') as FromName, isnull(FromAddress1, '') as FromAddress1 ,isnull(FromAddress2, '') as FromAddress2,isnull(FromAddress3, '') as FromAddress3,isnull(FromAddress4, '') as FromAddress4," +
                            " isnull(ToPostalCode, '') as ToPostalCode,isnull(ToName, '') as ToName,isnull(ToAddress1, '') as ToAddress1,isnull(ToAddress2, '') as ToAddress2," +
                            " isnull(ToAddress3, '') as ToAddress3,isnull(ToAddress4, '') as ToAddress4,isnull(UomCode, '') as UomCode" +
+                           ", Tobk1.TotalGrossWeight,Tobk1.NoOfPallet,Tobk1.TotalVolume,isnull(Tobk1.DescriptionOfGoods1,'')as DescriptionOfGoods1 ,isnull(Tobk1.Description,'') as Description,isnull(Tobk1.Note,'') as Note" +
                            " FROM Tobk1 where DriverCode='" + request.DriverCode+"'";
                              Result = db.Select<Tobk1>(strSQL);
                     }
@@ -138,14 +149,29 @@ namespace WebApi.ServiceModel.TMS
             {
                 using (var db = DbConnectionFactory.OpenDbConnection())
                 {
-                    Result = db.Update<Tobk1>(
-                                    new
-                                    {
-                                        CompletedFlag = request.CompletedFlag
-                                      
-                                    },
-                                    p => p.BookingNo == request.BookingNo
-                    );
+                    if (!string.IsNullOrEmpty(request.CompletedFlag))
+                    {
+                        Result = db.Update<Tobk1>(
+                                                          new
+                                                          {
+                                                              CompletedFlag = request.CompletedFlag
+
+                                                          },
+                                                          p => p.BookingNo == request.BookingNo
+                                          );
+                    } else if (!string.IsNullOrEmpty(request.Remark)) {
+                        Result = db.Update<Tobk1>(
+                                                  new
+                                                  {
+                                                      Note = request.Remark
+
+
+                                                  },
+                                                  p => p.BookingNo == request.BookingNo
+                                  );
+
+                    }
+                  
                 }
             }
             catch { throw; }

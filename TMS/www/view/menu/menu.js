@@ -1,16 +1,25 @@
 'use strict';
 app.controller('IndexCtrl', ['ENV', '$scope', '$state', '$rootScope', '$http',
-  '$ionicLoading', '$ionicPopup', '$ionicSideMenuDelegate', '$cordovaAppVersion',
+  '$ionicLoading', '$ionicPopup', '$ionicSideMenuDelegate', '$cordovaAppVersion', '$cordovaSQLite',
   function(ENV, $scope, $state, $rootScope, $http, $ionicLoading, $ionicPopup,
-    $ionicSideMenuDelegate, $cordovaAppVersion) {
+    $ionicSideMenuDelegate, $cordovaAppVersion, $cordovaSQLite) {
     var alertPopup = null;
     var alertPopupTitle = '';
     $scope.Status = {
       Login: false
     };
     $scope.logout = function() {
-      $rootScope.$broadcast('logout');
-      $state.go('index.login', {}, {});
+      // $rootScope.$broadcast('logout');
+      // $state.go('index.login', {}, {});
+      var confirmPopup = $ionicPopup.confirm({
+        title: 'Log Out',
+        template: 'Are you sure to log out?'
+      });
+      confirmPopup.then(function(res) {
+        if (res) {
+          deleteLogin();
+        }
+      });
     };
     $scope.gotoSetting = function() {
       $state.go('index.setting', {}, {
@@ -18,7 +27,21 @@ app.controller('IndexCtrl', ['ENV', '$scope', '$state', '$rootScope', '$http',
       });
     };
 
-
+    var deleteLogin = function() {
+      if (!ENV.fromWeb) {
+        $cordovaSQLite.execute(db, 'DELETE FROM Users')
+          .then(
+            function(res) {
+              $rootScope.$broadcast('logout');
+              $state.go('index.login', {}, {});
+            },
+            function(error) {}
+          );
+      } else {
+        $state.go('index.login', {}, {});
+        $rootScope.$broadcast('logout');
+      }
+    };
     $scope.gotoUpdate = function() {
       if (!ENV.fromWeb) {
         var url = ENV.website + '/' + ENV.updateFile;

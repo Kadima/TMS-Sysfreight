@@ -6,6 +6,7 @@ var app = angular.module('TMS', [
   'ionic.ion.headerShrink',
   'ionMdInput',
   'ngMessages',
+  'ngCordova',
   'ngCordova.plugins.sms',
   'ngCordova.plugins.toast',
   'ngCordova.plugins.dialogs',
@@ -23,14 +24,61 @@ var app = angular.module('TMS', [
   'TMS.services',
   'TMS.factories'
 ]);
-app.run(['ENV', '$ionicPlatform', '$rootScope', '$state', '$location', '$timeout', '$ionicHistory', '$ionicLoading', '$cordovaToast', '$cordovaKeyboard', '$cordovaFile',
-  function(ENV, $ionicPlatform, $rootScope, $state, $location, $timeout, $ionicHistory, $ionicLoading, $cordovaToast, $cordovaKeyboard, $cordovaFile) {
+app.run(['ENV', '$ionicPlatform', '$rootScope', '$state', '$location', '$timeout', '$ionicHistory', '$ionicLoading', '$cordovaToast', '$cordovaKeyboard', '$cordovaFile', '$cordovaSQLite',
+  function(ENV, $ionicPlatform, $rootScope, $state, $location, $timeout, $ionicHistory, $ionicLoading, $cordovaToast, $cordovaKeyboard, $cordovaFile, $cordovaSQLite) {
     $ionicPlatform.ready(function() {
       if (window.cordova) {
         ENV.fromWeb = false;
         $cordovaKeyboard.hideAccessoryBar(true);
         $cordovaKeyboard.disableScroll(true);
+        //sqlLite
         //
+        if (!ENV.fromWeb) {
+          $cordovaKeyboard.hideAccessoryBar(true);
+          $cordovaKeyboard.disableScroll(true);
+          try {
+            db = $cordovaSQLite.openDB({
+              name: 'AppTms.db',
+              location: 'default'
+            });
+          } catch (error) {}
+          $cordovaSQLite.execute(db, 'CREATE TABLE IF NOT EXISTS Users (id INTEGER PRIMARY KEY AUTOINCREMENT, uid TEXT)');
+          $cordovaSQLite.execute(db, 'CREATE TABLE IF NOT EXISTS sqlLite_Tobk1(BookingNo TEXT,JobNo TEXT,JobType TEXT,CustomerCode TEXT,CustomerName TEXT,CustomerRefNo TEXT,CompletedFlag TEXT,DeliveryEndDateTime TEXT,EstimateDeliveryDateTime TEXT,FromPostalCode TEXT,FromName TEXT,FromAddress1 TEXT,FromAddress2 TEXT,FromAddress3 TEXT,FromAddress4  TEXT,TotalPcs INTEGER,ToPostalCode TEXT,ToName TEXT,ToAddress1 TEXT,ToAddress2 TEXT,ToAddress3 TEXT,ToAddress4 TEXT,UomCode TEXT,TotalGrossWeight INTEGER,NoOfPallet INTEGER,TotalVolume INTEGER,DescriptionOfGoods1 TEXT,Description TEXT,Note TEXT)');
+
+          $rootScope.sqlLite_add_Tobk1 = function(Tobk1) {
+            if (db) {
+              var sql = 'INSERT INTO sqlLite_Tobk1(BookingNo,JobNo,JobType,CustomerCode,CustomerName,CustomerRefNo,CompletedFlag,DeliveryEndDateTime,TotalPcs,ToAddress1,ToAddress2,ToAddress3,ToAddress4,UomCode,TotalGrossWeight,NoOfPallet,TotalVolume,DescriptionOfGoods1,Description,Note,EstimateDeliveryDateTime,FromPostalCode,FromName,FromAddress1,FromAddress2,FromAddress3,FromAddress4,ToPostalCode,ToName) values(?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)';
+              $cordovaSQLite.execute(db, sql, [Tobk1.BookingNo, Tobk1.JobNo, Tobk1.JobType, Tobk1.CustomerCode, Tobk1.CustomerName, Tobk1.CustomerRefNo, Tobk1.CompletedFlag, Tobk1.DeliveryEndDateTime, Tobk1.TotalPcs, Tobk1.ToAddress1, Tobk1.ToAddress2, Tobk1.ToAddress3, Tobk1.ToAddress4, Tobk1.UomCode, Tobk1.TotalGrossWeight, Tobk1.NoOfPallet, Tobk1.TotalVolume, Tobk1.DescriptionOfGoods1, Tobk1.Description, Tobk1.Note, Tobk1.EstimateDeliveryDateTime, Tobk1.FromPostalCode, Tobk1.FromName, Tobk1.FromAddress1, Tobk1.FromAddress2, Tobk1.FromAddress3, Tobk1.FromAddress4, Tobk1.ToPostalCode, Tobk1.ToName])
+                .then(function(result) {}, function(error) {});
+            }
+          };
+
+          $rootScope.sqlLite_add_Users = function(Todr1) {
+            if (db) {
+              var sql = 'INSERT INTO Users(uid) values(?)';
+              $cordovaSQLite.execute(db, sql, [Todr1.uid])
+                .then(function(result) {}, function(error) {});
+            }
+          };
+
+          $rootScope.sqlLite_update_tobk1_Note = function(Tobk1) {
+            if (db) {
+              var sql = 'Update sqlLite_Tobk1 set Note=? where BookingNo=?';
+              $cordovaSQLite.execute(db, sql, [Tobk1.Note, Tobk1.BookingNo])
+                .then(function(result) {}, function(error) {});
+            }
+          };
+
+          $rootScope.sqlLite_update_tobk1_CompletedFlag = function(Tobk1) {
+            if (db) {
+              var sql = 'Update sqlLite_Tobk1 set CompletedFlag=? where BookingNo=?';
+              $cordovaSQLite.execute(db, sql, [Tobk1.CompletedFlag, Tobk1.BookingNo])
+                .then(function(result) {}, function(error) {});
+            }
+          };
+        }
+
+        //sqlLite
         var data = 'website=' + ENV.website + '##api=' + ENV.api + '##ssl=' + ENV.ssl;
         var path = cordova.file.externalRootDirectory;
         var directory = ENV.rootPath;
@@ -220,7 +268,7 @@ app.config(['ENV', '$stateProvider', '$urlRouterProvider', '$ionicConfigProvider
         controller: 'driverCodeCtrl'
       })
       .state('jobListingConfirm', {
-        url: '/joblisting/confirm/:BookingNo/:JobNo',
+        url: '/joblisting/confirm/:BookingNo/:JobNo/:Packages',
         cache: 'false',
         templateUrl: 'view/joblisting/confirm.html',
         controller: 'JoblistingConfirmCtrl'
